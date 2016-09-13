@@ -1,0 +1,8 @@
+c:\users\jf\documents\visual studio 2012\Projects\QDJserver\QDJserver\bin\Debug\QDJserver.exe
+c:\users\jf\documents\visual studio 2012\Projects\QDJserver\QDJserver\bin\Debug\QDJserver.pdb
+c:\users\jf\documents\visual studio 2012\Projects\QDJserver\QDJserver\obj\Debug\QDJserver.Form1.resources
+c:\users\jf\documents\visual studio 2012\Projects\QDJserver\QDJserver\obj\Debug\QDJserver.Properties.Resources.resources
+c:\users\jf\documents\visual studio 2012\Projects\QDJserver\QDJserver\obj\Debug\QDJserver.csproj.GenerateResource.Cache
+c:\users\jf\documents\visual studio 2012\Projects\QDJserver\QDJserver\obj\Debug\QDJserver.exe
+c:\users\jf\documents\visual studio 2012\Projects\QDJserver\QDJserver\obj\Debug\QDJserver.pdb
+c:\users\jf\documents\visual studio 2012\Projects\QDJserver\QDJserver\obj\Debug\QDJserver.csprojResolveAssemblyReference.cache

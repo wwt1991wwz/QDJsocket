@@ -1,0 +1,7 @@
+c:\users\jf\documents\visual studio 2012\Projects\QDJclient\QDJclient\bin\Debug\QDJclient.exe
+c:\users\jf\documents\visual studio 2012\Projects\QDJclient\QDJclient\bin\Debug\QDJclient.pdb
+c:\users\jf\documents\visual studio 2012\Projects\QDJclient\QDJclient\obj\Debug\QDJclient.Form1.resources
+c:\users\jf\documents\visual studio 2012\Projects\QDJclient\QDJclient\obj\Debug\QDJclient.Properties.Resources.resources
+c:\users\jf\documents\visual studio 2012\Projects\QDJclient\QDJclient\obj\Debug\QDJclient.csproj.GenerateResource.Cache
+c:\users\jf\documents\visual studio 2012\Projects\QDJclient\QDJclient\obj\Debug\QDJclient.exe
+c:\users\jf\documents\visual studio 2012\Projects\QDJclient\QDJclient\obj\Debug\QDJclient.pdb
