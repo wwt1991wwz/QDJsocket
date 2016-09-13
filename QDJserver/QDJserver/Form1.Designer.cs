@@ -31,6 +31,7 @@
             this.button2 = new System.Windows.Forms.Button();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.userList = new System.Windows.Forms.ListView();
             this.SuspendLayout();
             // 
             // button2
@@ -59,11 +60,22 @@
             this.textBox1.Size = new System.Drawing.Size(330, 126);
             this.textBox1.TabIndex = 6;
             // 
+            // userList
+            // 
+            this.userList.CheckBoxes = true;
+            this.userList.Location = new System.Drawing.Point(440, 75);
+            this.userList.Name = "userList";
+            this.userList.Size = new System.Drawing.Size(121, 187);
+            this.userList.TabIndex = 10;
+            this.userList.UseCompatibleStateImageBehavior = false;
+            this.userList.View = System.Windows.Forms.View.List;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(460, 362);
+            this.ClientSize = new System.Drawing.Size(609, 481);
+            this.Controls.Add(this.userList);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.textBox1);
@@ -80,6 +92,7 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.ListView userList;
     }
 }
 

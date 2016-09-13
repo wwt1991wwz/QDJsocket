@@ -17,22 +17,27 @@ namespace QDJclient
         public Form1()
         {
             InitializeComponent();
-            TextBox.CheckForIllegalCrossThreadCalls = false;//关闭跨线程修改控件检查
+            //TextBox.CheckForIllegalCrossThreadCalls = false;//关闭跨线程修改控件检查
         }
         public Socket clientSocket;
         private string recvStr = "";
         private byte[] recvBytes = new byte[1024];
         private int bytes;
-        private Thread startConnect;
+        //private Thread startConnect;
         private Thread startRecieve;
+        public delegate void MyInvoke(string str);//控件中显示消息的委托
         private void button1_Click(object sender, EventArgs e)
         {
-            startConnect = new Thread(connect);
-            startConnect.IsBackground = true;
-            startConnect.Start();
+            connect();
 
-            startRecieve = new Thread(waitForMessage);
-            startRecieve.IsBackground = true;
+            
+
+            //startRecieve = new Thread(waitForMessage);
+            //startRecieve.IsBackground = true;
+            //startRecieve.Start();
+
+            ThreadStart myThreaddelegateRecieve = new ThreadStart(recieve);
+            startRecieve = new Thread(myThreaddelegateRecieve);
             startRecieve.Start();
 
         }
@@ -40,7 +45,7 @@ namespace QDJclient
         {
             try
             {
-                int port = 2000;
+                int port = 11000;
                 string host = "127.0.0.1";
                 //创建终结点EndPoint
                 IPAddress ip = IPAddress.Parse(host);
@@ -53,11 +58,25 @@ namespace QDJclient
             }
             catch (Exception exp)
             {
-                textBox1.AppendText(exp.Message);
+                showMsg(exp.Message);
             }
         }
-    
 
+        public void showMsg(string msg)
+        {
+            {
+                //在线程里以安全方式调用控件
+                if (textBox1.InvokeRequired)
+                {
+                    MyInvoke _myinvoke = new MyInvoke(showMsg);
+                    textBox1.Invoke(_myinvoke, new object[] { msg });
+                }
+                else
+                {
+                    textBox1.AppendText(msg);
+                }
+            }
+        }
 
         //发送消息
         private void button3_Click(object sender, EventArgs e)
@@ -74,7 +93,7 @@ namespace QDJclient
             }
         }
         //接收消息的方法
-        public void waitForMessage()
+        public void recieve()
         {
             while (true)
             {
@@ -82,7 +101,7 @@ namespace QDJclient
                 {
                     bytes = clientSocket.Receive(recvBytes, recvBytes.Length, 0);    //从服务器端接受返回信息
                     recvStr = Encoding.ASCII.GetString(recvBytes, 0, bytes);
-                    textBox1.AppendText(recvStr + "\r\n");
+                    showMsg(recvStr + "\r\n");
                 }
             }
         }

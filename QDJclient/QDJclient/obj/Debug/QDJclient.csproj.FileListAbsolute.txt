@@ -5,3 +5,11 @@ c:\users\jf\documents\visual studio 2012\Projects\QDJclient\QDJclient\obj\Debug\
 c:\users\jf\documents\visual studio 2012\Projects\QDJclient\QDJclient\obj\Debug\QDJclient.csproj.GenerateResource.Cache
 c:\users\jf\documents\visual studio 2012\Projects\QDJclient\QDJclient\obj\Debug\QDJclient.exe
 c:\users\jf\documents\visual studio 2012\Projects\QDJclient\QDJclient\obj\Debug\QDJclient.pdb
+C:\Users\jf\Desktop\QDJsocket\QDJclient\QDJclient\obj\Debug\QDJclient.exe
+C:\Users\jf\Desktop\QDJsocket\QDJclient\QDJclient\obj\Debug\QDJclient.pdb
+C:\Users\jf\Desktop\QDJsocket\QDJclient\QDJclient\bin\Debug\QDJclient.exe
+C:\Users\jf\Desktop\QDJsocket\QDJclient\QDJclient\bin\Debug\QDJclient.pdb
+C:\Users\jf\Desktop\QDJsocket\QDJclient\QDJclient\obj\Debug\QDJclient.csprojResolveAssemblyReference.cache
+C:\Users\jf\Desktop\QDJsocket\QDJclient\QDJclient\obj\Debug\QDJclient.Form1.resources
+C:\Users\jf\Desktop\QDJsocket\QDJclient\QDJclient\obj\Debug\QDJclient.Properties.Resources.resources
+C:\Users\jf\Desktop\QDJsocket\QDJclient\QDJclient\obj\Debug\QDJclient.csproj.GenerateResource.Cache
