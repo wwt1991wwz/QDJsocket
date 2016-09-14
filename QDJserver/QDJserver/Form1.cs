@@ -20,6 +20,9 @@ namespace QDJserver
             InitializeComponent();
             //TextBox.CheckForIllegalCrossThreadCalls = false;//关闭跨线程修改控件检查
         }
+        // Thread signal.     
+        public static ManualResetEvent allDone = new ManualResetEvent(false);
+        public static ManualResetEvent rcv = new ManualResetEvent(false);
         public Socket server;//和客户端建立连接后系统返回的socket
         public Socket skt;
         public Socket client;
@@ -39,28 +42,30 @@ namespace QDJserver
         {
             int port = 11000;
             string host = "127.0.0.1";
+            //创建终结点
+            IPAddress ip = IPAddress.Parse(host);
+            IPEndPoint ipe = new IPEndPoint(ip, port);
+            _sessionTable = new Hashtable(100);
+            //创建socket并开始监听
+
+            skt = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);//创建一个Socket对象，如果用UDP协议，则要用SocketTyype.Dgram类型的套接字
+            //允许SOCKET被绑定在已使用的地址上。
+            skt.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             try
             {
-                //创建终结点
-                IPAddress ip = IPAddress.Parse(host);
-                IPEndPoint ipe = new IPEndPoint(ip, port);
-                _sessionTable = new Hashtable(100);
-                //创建socket并开始监听
-
-                skt = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);//创建一个Socket对象，如果用UDP协议，则要用SocketTyype.Dgram类型的套接字
-                //允许SOCKET被绑定在已使用的地址上。
-                skt.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+               
                 skt.Bind(ipe);//绑定ip和端口
                 skt.Listen(5);
-
                 showClientMsg("开始监听，等待客户端连接\r\n");
-
-                //开始接受连接，异步。
-                skt.BeginAccept(new AsyncCallback(OnConnectRequest), skt);
-
-                
-
-
+                while (true)
+                {
+                    // Set the event to nonsignaled state.     
+                    allDone.Reset();
+                    //开始接受连接，异步。
+                    skt.BeginAccept(new AsyncCallback(OnConnectRequest), skt);
+                    // Wait until a connection is made before continuing.     
+                    allDone.WaitOne();
+                }
             }
             catch (Exception e)
             {
@@ -71,13 +76,15 @@ namespace QDJserver
         //当有客户端连接时的处理
         public void OnConnectRequest(IAsyncResult ar)
         {
+            // Signal the main thread to continue.     
+            allDone.Set();
             //还原传入的原始套接字
             server = (Socket)ar.AsyncState;
             //初始化一个SOCKET，用于其它客户端的连接
             client = server.EndAccept(ar);
             //将要发送给连接上来的客户端的提示字符串
             DateTimeOffset now = DateTimeOffset.Now;
-            string strDateLine = "欢迎登录到服务器";
+            string strDateLine = "welcome to server";
             Byte[] byteDateLine = System.Text.Encoding.UTF8.GetBytes(strDateLine);
 
             //将提示信息发送给客户端
@@ -88,24 +95,38 @@ namespace QDJserver
             userListAdd(client.RemoteEndPoint.ToString());
             
             //把连接成功的客户端的SOCKET实例放入哈希表
-            _sessionTable.Add(client.RemoteEndPoint.ToString(), client.RemoteEndPoint);
-
+            _sessionTable.Add(client.RemoteEndPoint.ToString(), client);
+            
             //等待新的客户端连接
-            server.BeginAccept(new AsyncCallback(OnConnectRequest), server);
-
+            //server.BeginAccept(new AsyncCallback(OnConnectRequest), server);
             Thread receiveThread = new Thread(receive);
             receiveThread.Start(client);
 
-            // Create the state object.
-
-            //StateObject state = new StateObject();
-            //state.workSocket = client;
-            //client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(receiveCallback), state);
+            
 
         }
-
+        //异步接收数据方法
+        public void receive(object clientSocket)
+        {
+            Socket myClientSocket = (Socket)clientSocket;
+            while (true)
+            {
+                //rcv.Reset();
+                if (myClientSocket != null)
+                {
+                    // Create the state object.
+                    StateObject state = new StateObject();
+                    state.workSocket = myClientSocket;
+                    myClientSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(receiveCallback), state);
+                }
+                //rcv.WaitOne();
+            }
+        }
+        //回调接收数据的方法    
         public  void receiveCallback(IAsyncResult ar)
         {
+
+            //rcv.Set();
             String content = String.Empty;
             // Retrieve the state object and the handler socket     
             // from the asynchronous state object.     
@@ -121,18 +142,21 @@ namespace QDJserver
                 // more data.     
                 content = state.sb.ToString();
                 showClientMsg(content);
-                //if (content.IndexOf("<EOF>") > -1)
+                //还可以使用 if(client.Available<=0) 来判断接收缓冲区中已经空了。
+                //或者使用client.DataAvailable
+                //if (content.IndexOf("<EOF>") == -1)
+                //if (client.Available <= 0)
                 //{
                 //    // All the data has been read from the     
                 //    // client. Display it on the console.     
-                //    Console.WriteLine("Read {0} bytes from socket. \n Data : {1}", content.Length, content);
-                //    // Echo the data back to the client.     
-                //    Send(handler, content);
+                //    //Console.WriteLine("Read {0} bytes from socket. \n Data : {1}", content.Length, content);
+                //    //在控件中将接收到的消息显示出来   
+                //    showClientMsg(content);
                 //}
                 //else
                 //{
                 //    // Not all data received. Get more.     
-                //    handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallback), state);
+                //    handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(receiveCallback), state);
                 //}
             }
         }
@@ -179,41 +203,24 @@ namespace QDJserver
                 
         //    }
         //}
-        public void receive(object clientSocket)
-        {
-            Socket myClientSocket = (Socket)clientSocket;
-            while (true)
-            {
-                if (myClientSocket != null)
-                {
-                    bytes = myClientSocket.Receive(recvBytes, recvBytes.Length, 0);
-                    if (bytes != 0)
-                    {
-                        recvStr = Encoding.ASCII.GetString(recvBytes, 0, bytes);
-                        showClientMsg(myClientSocket.RemoteEndPoint.ToString()+recvStr + "\r\n");
-                    }
-                }
-                
-            }
-        }
+        
         //发送消息
         private void button2_Click(object sender, EventArgs e)
         {
             try
             {
                 string sendStr = textBox2.Text;
+                //在已连接的列表里取出用户
                 string endPointTostring = this.userList.CheckedItems.ToString();
+                //如果选取多个用户，就依次发送消息
                 for (int i = 0; i < userList.CheckedItems.Count; i++)
                 {
-
                     if (userList.CheckedItems[i].Checked)
                     {
                         endPointTostring = userList.CheckedItems[i].SubItems[0].Text;
-                        MessageBox.Show(endPointTostring);
                         SendMsg(endPointTostring, sendStr);
                     }
                 }
-                
             }
             catch (Exception exc)
             {
@@ -226,11 +233,10 @@ namespace QDJserver
         {
             
             Byte[] sendData = Encoding.UTF8.GetBytes(msg);
-            
-
-            EndPoint temp = (EndPoint)_sessionTable[endPonitToString];
-
-            client.SendTo(sendData, temp);
+            //在哈希表里取出指定的套接字
+            Socket temp = (Socket)_sessionTable[endPonitToString];
+            temp.Send(sendData);
+            //client.SendTo(sendData, temp);
             textBox2.Text = "";
 
 
